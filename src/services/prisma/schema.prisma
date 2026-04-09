@@ -1,0 +1,280 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model Settings {
+  id                            String   @id @default("singleton")
+  siteTitle                     String   @default("বন্ধন'১৭")
+  logoUrl                       String?
+  logoPublicId                  String?
+  minMonthlySavings             Int      @default(1000)
+  shareValue                    Int      @default(1000)
+  policyContent                 String
+  maxSharesPerMember            Int      @default(3)
+  loanToSavingsRatioNumerator   Int      @default(1)
+  loanToSavingsRatioDenominator Int      @default(3)
+  loanSystemEnabled             Boolean  @default(false)
+  createdAt                     DateTime @default(now())
+  updatedAt                     DateTime @updatedAt
+}
+
+model Event {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  description String?
+  amount      Float
+  startDate   DateTime
+  endDate     DateTime
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  eventPayments EventPayment[]
+}
+
+model EventPayment {
+  id            String      @id @default(auto()) @map("_id") @db.ObjectId
+  memberId      String      @db.ObjectId
+  eventId       String      @db.ObjectId
+  transactionId String      @db.ObjectId
+  createdAt     DateTime    @default(now())
+  member        Member      @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  event         Event       @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  transaction   Transaction @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+
+  @@unique([memberId, eventId])
+}
+
+model PaymentAccount {
+  id            String             @id @default(auto()) @map("_id") @db.ObjectId
+  accountName   String
+  accountType   PaymentAccountType
+  accountNumber String
+  bankName      String?
+  notice        String?
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+}
+
+model Member {
+  id                    String   @id @default(auto()) @map("_id") @db.ObjectId
+  clerkId               String   @unique
+  status                String   @default("AwaitingRegistration") // AwaitingRegistration | Pending | Approved | Rejected | Flagged
+  joiningType           String   @default("New") // New | Old
+  rejectionReason       String?
+  fullNameBn            String?
+  fullNameEn            String?
+  fatherName            String?
+  motherName            String?
+  nid                   String?  @unique
+  dob                   DateTime?
+  bloodGroup            String?
+  maritalStatus         String?
+  religion              String?
+  mobilePrimary         String?  @unique
+  mobileAlternate       String?
+  email                 String?  @unique
+  currentAddress        String?
+  permanentAddress      String?
+  sscBatch              String?
+  otherEducation        String?
+  profession            String?
+  workplace             String?
+  bankName              String?
+  branch                String?
+  accountNumber         String?
+  accountType           String?
+  bankingMethod         String?
+  nomineeName           String?
+  nomineeRelation       String?
+  nomineeMobile         String?
+  nomineeAddress        String?
+  photoUrl              String?
+  nidCopyUrl            String?
+  bankStatementUrl      String?
+  photoPublicId         String?
+  nidCopyPublicId       String?
+  bankStatementPublicId String?
+  joiningDate           DateTime?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  transactions    Transaction[]
+  approvedPayments ApprovedPayment[]
+  loans           Loan[]
+  shares          Share[]
+  messages        Message[]
+  profileUpdates  ProfileUpdate[]
+  eventPayments   EventPayment[]
+  shareTransfersFrom ShareTransfer[] @relation("FromMember")
+  shareTransfersTo   ShareTransfer[] @relation("ToMember")
+}
+
+model Post {
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  title          String
+  content        String
+  type           String // NOTICE | DASHBOARD_POST
+  imageUrls      String?
+  imagePublicIds String?
+  authorId       String
+  status         String   @default("Draft") // Published | Draft
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Share {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  memberId      String   @db.ObjectId
+  sharerName    String
+  sharerNid     String
+  sharerPhone   String
+  sharerAddress String
+  status        String   @default("Active") // Active | Removed | ForTransfer | Converted
+  joiningDate   DateTime @default(now())
+  removedAt     DateTime?
+  convertedAt   DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  member        Member       @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  transactions  Transaction[]
+  transfers     ShareTransfer[]
+}
+
+model ShareTransfer {
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+    shareId String @db.ObjectId
+    fromMemberId String @db.ObjectId
+    toMemberId String @db.ObjectId
+    transferredAt DateTime @default(now())
+    approvedBy String
+
+    share Share @relation(fields: [shareId], references: [id], onDelete: Cascade)
+    fromMember Member @relation("FromMember", fields: [fromMemberId], references: [id], onDelete: Cascade)
+    toMember Member @relation("ToMember", fields: [toMemberId], references: [id], onDelete: Cascade)
+}
+
+model Loan {
+  id                String   @id @default(auto()) @map("_id") @db.ObjectId
+  memberId          String   @db.ObjectId
+  applicationDate   DateTime @default(now())
+  approvalDate      DateTime?
+  amount            Float
+  repaidAmount      Float    @default(0)
+  reason            String
+  additionalInfo    String?
+  repaymentPeriod   Int
+  applicationStatus String   @default("Pending") // Pending | Approved | Rejected
+  loanStatus        String   @default("N_A") // N_A | Active | Repaid
+  paidMonths        Json?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  member       Member        @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  guarantor    Guarantor?
+  transactions Transaction[]
+}
+
+model Guarantor {
+  id                String   @id @default(auto()) @map("_id") @db.ObjectId
+  loanId            String   @unique @db.ObjectId
+  name              String
+  phone             String
+  address           String
+  nidNumber         String
+  nidCopyUrl        String
+  nidCopyPublicId   String
+  deathPayee        String
+  altPayeeName      String?
+  altPayeeRelation  String?
+  altPayeePhone     String?
+  altPayeeAddress   String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  loan              Loan     @relation(fields: [loanId], references: [id], onDelete: Cascade)
+}
+
+model Transaction {
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  memberId        String   @db.ObjectId
+  loanId          String?  @db.ObjectId
+  date            DateTime @default(now())
+  amount          Float
+  type            String // MONTHLY_SAVINGS | LOAN_REPAYMENT | LOAN_DISBURSEMENT | OTHER
+  reason          String?
+  status          String // Completed | Pending | Failed
+  paymentMethod   String
+  service         String?
+  bankName        String?
+  branch          String?
+  accountNumber   String?
+  transactionId   String?  @unique
+  senderNumber    String?
+  approvedBy      String?
+  paymentForMonth DateTime? // Stores the start of the month date
+  shareId         String?  @db.ObjectId
+  notes           String?
+  isSystem        Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  member Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  loan   Loan?  @relation(fields: [loanId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  share  Share? @relation(fields: [shareId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  eventPayment EventPayment?
+}
+
+model Message {
+  id       String   @id @default(auto()) @map("_id") @db.ObjectId
+  memberId String   @db.ObjectId
+  title    String
+  content  String
+  isRead   Boolean  @default(false)
+  sentAt   DateTime @default(now())
+  member   Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
+}
+
+model ProfileUpdate {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  memberId   String   @db.ObjectId
+  status     String   @default("Pending") // Pending | Approved | Rejected
+  updateData Json
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  member     Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
+}
+
+model ApprovedPayment {
+  id             String    @id @default(auto()) @map("_id") @db.ObjectId
+  memberId       String    @db.ObjectId
+  shareId        String?   @db.ObjectId
+  amount         Float
+  type           String // MONTHLY_SAVINGS | LOAN_REPAYMENT | OTHER
+  status         String    @default("Pending") // Pending | Approved | Rejected
+  paymentForMonth DateTime?
+  transactionId  String    @unique
+  senderNumber   String?
+  notes          String?
+  paymentMethod  String
+  approvedBy     String?
+  approvedAt     DateTime?
+  eventId        String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  member Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
+}
+
+enum PaymentAccountType {
+  MobileBanking
+  Bank
+}

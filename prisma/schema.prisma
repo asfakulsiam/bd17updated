@@ -1,0 +1,322 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model Settings {
+  id                            String  @id @default(cuid()) @map("_id")
+  key                           String  @unique @default("singleton")
+  siteTitle                     String
+  logoUrl                       String?
+  logoPublicId                  String?
+  minMonthlySavings             Int     @default(1000)
+  shareValue                    Int     @default(1000)
+  policyContent                 String
+  maxSharesPerMember            Int     @default(3)
+  loanToSavingsRatioNumerator   Int     @default(1)
+  loanToSavingsRatioDenominator Int     @default(3)
+  loanSystemEnabled             Boolean @default(false)
+  createdAt                     DateTime @default(now())
+  updatedAt                     DateTime @updatedAt
+}
+
+
+model Member {
+  id                      String    @id @default(cuid()) @map("_id")
+  clerkId                 String    @unique
+  status                  String    @default("AwaitingRegistration")
+  joiningType             String    @default("New")
+  rejectionReason         String?
+  advanceBalance          Float     @default(0)
+  totalDue                Float     @default(0)
+  currentMonthDue         Float     @default(0)
+
+  // Personal
+  fullNameBn              String?
+  fullNameEn              String?
+  fatherName              String?
+  motherName              String?
+  nid                     String?
+  dob                     DateTime?
+  bloodGroup              String?
+  maritalStatus           String?
+  religion                String?
+
+  // Contact
+  mobilePrimary           String?
+  mobileAlternate         String?
+  email                   String?   @unique
+  currentAddress          String?
+  permanentAddress        String?
+
+  // Education & Profession
+  sscBatch                String?
+  otherEducation          String?
+  profession              String?
+  workplace               String?
+
+  // Bank
+  bankName                String?
+  branch                  String?
+  accountNumber           String?
+  accountType             String?
+  bankingMethod           String?
+
+  // Nominee
+  nomineeName             String?
+  nomineeRelation         String?
+  nomineeMobile           String?
+  nomineeAddress          String?
+
+  // Attachments
+  photoUrl                String?
+  nidCopyUrl              String?
+  bankStatementUrl        String?
+  photoPublicId           String?
+  nidCopyPublicId         String?
+  bankStatementPublicId   String?
+  
+  joiningDate             DateTime?
+  createdAt               DateTime  @default(now())
+  updatedAt               DateTime  @updatedAt
+  
+  // Relations
+  shares                  Share[]
+  transactions            Transaction[]
+  loans                   Loan[]
+  messages                Message[]
+  profileUpdates          ProfileUpdate[]
+  approvedPayments        ApprovedPayment[]
+  eventPayments           EventPayment[]
+  monthlyPayments         MonthlyPayment[]
+  
+  // @@index([clerkId]) // This is redundant because of @unique
+}
+
+
+model Share {
+  id              String    @id @default(cuid()) @map("_id")
+  memberId        String
+  member          Member    @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  sharerName      String
+  sharerNid       String
+  sharerPhone     String
+  sharerAddress   String
+  status          String
+  joiningDate     DateTime
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  removedAt       DateTime?
+  convertedAt     DateTime?
+  
+  transfers       ShareTransfer[]
+  monthlyPayments MonthlyPayment[]
+}
+
+model Transaction {
+  id              String   @id @default(cuid()) @map("_id")
+  memberId        String
+  member          Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  loanId          String?
+  loan            Loan?    @relation(fields: [loanId], references: [id], onDelete: SetNull)
+  date            DateTime
+  amount          Float
+  type            String
+  reason          String?
+  status          String
+  paymentMethod   String?
+  transactionId   String?  @unique
+  senderNumber    String?
+  approvedBy      String?
+  notes           String?
+  isSystem        Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  eventPayment    EventPayment?
+  eventId         String?
+  
+  @@index([memberId])
+  @@index([loanId])
+}
+
+
+model ApprovedPayment {
+  id              String   @id @default(cuid()) @map("_id")
+  memberId        String
+  member          Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  shareId         String?
+  amount          Float
+  type            String
+  status          String   @default("Pending")
+  paymentForMonth DateTime?
+  transactionId   String   @unique
+  senderNumber    String?
+  notes           String?
+  paymentMethod   String
+  approvedBy      String?
+  approvedAt      DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  eventId         String?
+  event           Event?   @relation(fields: [eventId], references: [id], onDelete: SetNull)
+}
+
+model Loan {
+  id                String   @id @default(cuid()) @map("_id")
+  memberId          String
+  member            Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  applicationDate   DateTime
+  approvalDate      DateTime?
+  amount            Float
+  repaidAmount      Float    @default(0)
+  reason            String
+  additionalInfo    String?
+  repaymentPeriod   Int
+  applicationStatus String
+  loanStatus        String
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  guarantor         Guarantor?
+  transactions      Transaction[]
+  installments      LoanInstallment[]
+}
+
+model Guarantor {
+  id                  String   @id @default(cuid()) @map("_id")
+  loanId              String   @unique
+  loan                Loan     @relation(fields: [loanId], references: [id], onDelete: Cascade)
+  name                String
+  phone               String
+  address             String
+  nidNumber           String
+  nidCopyUrl          String
+  nidCopyPublicId     String
+  deathPayee          String
+  altPayeeName        String?
+  altPayeeRelation    String?
+  altPayeePhone       String?
+  altPayeeAddress     String?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+}
+
+model Post {
+  id              String   @id @default(cuid()) @map("_id")
+  title           String
+  content         String
+  type            String
+  imageUrls       String[]
+  imagePublicIds  String[]
+  authorId        String
+  status          String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Message {
+  id       String   @id @default(cuid()) @map("_id")
+  memberId String
+  member   Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  title    String
+  content  String
+  isRead   Boolean  @default(false)
+  sentAt   DateTime @default(now())
+}
+
+model ProfileUpdate {
+  id         String   @id @default(cuid()) @map("_id")
+  memberId   String
+  member     Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  status     String
+  updateData Json
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model PaymentAccount {
+  id            String   @id @default(cuid()) @map("_id")
+  accountName   String
+  accountType   String
+  accountNumber String
+  bankName      String?
+  notice        String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Event {
+    id          String   @id @default(cuid()) @map("_id")
+    name        String
+    description String?
+    amount      Float
+    startDate   DateTime
+    endDate     DateTime
+    isActive    Boolean  @default(true)
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+    
+    payments        ApprovedPayment[]
+    eventPayments   EventPayment[]
+}
+
+model EventPayment {
+    id              String      @id @default(cuid()) @map("_id")
+    memberId        String
+    member          Member      @relation(fields: [memberId], references: [id], onDelete: Cascade)
+    eventId         String
+    event           Event       @relation(fields: [eventId], references: [id], onDelete: Cascade)
+    transactionId   String      @unique
+    transaction     Transaction @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+    createdAt       DateTime    @default(now())
+    
+    @@index([memberId])
+    @@index([eventId])
+}
+
+
+model ShareTransfer {
+  id            String   @id @default(cuid()) @map("_id")
+  shareId       String
+  share         Share    @relation(fields: [shareId], references: [id], onDelete: Cascade)
+  fromMemberId  String
+  toMemberId    String
+  transferredAt DateTime
+  approvedBy    String
+}
+
+
+model MonthlyPayment {
+  id        String   @id @default(cuid()) @map("_id")
+  memberId  String
+  member    Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  shareId   String?
+  share     Share?   @relation(fields: [shareId], references: [id], onDelete: SetNull)
+  month     DateTime
+  expected  Float
+  paid      Float
+  status    String   // Due, Paid, Partial
+
+  @@unique([memberId, shareId, month])
+}
+
+model LoanInstallment {
+  id       String   @id @default(cuid()) @map("_id")
+  loanId   String
+  loan     Loan     @relation(fields: [loanId], references: [id], onDelete: Cascade)
+  month    DateTime
+  expected Float
+  paid     Float
+  status   String // Due, Paid, Partial
+  
+  @@unique([loanId, month])
+}

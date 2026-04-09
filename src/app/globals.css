@@ -1,0 +1,81 @@
+
+@import "tailwindcss";
+@import "tailwindcss-animate";
+
+body {
+  font-family: 'PT Sans', sans-serif;
+}
+
+@theme {
+  --color-background: hsl(170 53% 92%);
+  --color-foreground: hsl(215 30% 20%);
+  --color-card: hsl(170 53% 97%);
+  --color-card-foreground: hsl(215 30% 20%);
+  --color-popover: hsl(170 53% 97%);
+  --color-popover-foreground: hsl(215 30% 20%);
+  --color-primary: hsl(158 45% 54%);
+  --color-primary-foreground: hsl(160 100% 5%);
+  --color-secondary: hsl(170 40% 85%);
+  --color-secondary-foreground: hsl(215 30% 20%);
+  --color-muted: hsl(170 40% 85%);
+  --color-muted-foreground: hsl(215 30% 40%);
+  --color-accent: hsl(89 56% 66%);
+  --color-accent-foreground: hsl(90 100% 10%);
+  --color-destructive: hsl(0 84.2% 60.2%);
+  --color-destructive-foreground: hsl(0 0% 98%);
+  --color-border: hsl(170 40% 80%);
+  --color-input: hsl(170 40% 85%);
+  --color-ring: hsl(158 45% 54%);
+  --radius-lg: 0.5rem;
+  --radius-md: calc(0.5rem - 2px);
+  --radius-sm: calc(0.5rem - 4px);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  input[type="number"] {
+    -moz-appearance: textfield;
+  }
+}
+
+@layer utilities {
+  .printable-receipt {
+    .receipt-content {
+      display: block;
+    }
+  }
+
+  @media print {
+    body * {
+      visibility: hidden;
+    }
+    .printable-receipt, .printable-receipt * {
+      visibility: visible;
+    }
+    .printable-receipt {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+    }
+    .no-print {
+        display: none;
+    }
+  }
+
+  .animate-fade-in-up {
+      animation: fade-in-up 0.5s ease-in-out forwards;
+      opacity: 0;
+  }
+}
+

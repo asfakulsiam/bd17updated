@@ -1,0 +1,343 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model Member {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  clerkId   String   @unique
+  status    String   @default("AwaitingRegistration")
+  joiningType String @default("New")
+  rejectionReason String?
+
+  advanceBalance Float @default(0)
+
+  // Personal
+  fullNameBn      String?
+  fullNameEn      String?
+  fatherName      String?
+  motherName      String?
+  nid             String?
+  dob             DateTime?
+  bloodGroup      String?
+  maritalStatus   String?
+  religion        String?
+
+  // Contact
+  mobilePrimary   String?
+  mobileAlternate String?
+  email           String?
+  currentAddress  String?
+  permanentAddress String?
+
+  // Education & Profession
+  sscBatch        String?
+  otherEducation  String?
+  profession      String?
+  workplace       String?
+
+  // Bank Info
+  bankName        String?
+  branch          String?
+  accountNumber   String?
+  accountType     String?
+  bankingMethod   String?
+
+  // Nominee
+  nomineeName     String?
+  nomineeRelation String?
+  nomineeMobile   String?
+  nomineeAddress  String?
+
+  // Attachments
+  photoUrl            String?
+  nidCopyUrl          String?
+  bankStatementUrl    String?
+  photoPublicId       String?
+  nidCopyPublicId     String?
+  bankStatementPublicId String?
+
+  joiningDate DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  transactions      Transaction[]
+  loans             Loan[]
+  messages          Message[]
+  shares            Share[]
+  profileUpdates    ProfileUpdate[]
+  eventPayments     EventPayment[]
+  monthlyPayments   MonthlyPayment[]
+  sentShareTransfers  ShareTransfer[] @relation("ShareTransfersFrom")
+  receivedShareTransfers ShareTransfer[] @relation("ShareTransfersTo")
+}
+
+model Transaction {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  memberId  String   @db.ObjectId
+  loanId    String?  @db.ObjectId
+  date      DateTime @default(now())
+  amount    Float
+  type      String
+  reason    String?
+  status    String   @default("Pending")
+
+  paymentMethod String?
+  transactionId String?  @unique
+  senderNumber  String?
+  approvedBy    String?
+  notes         String?
+  isSystem      Boolean? @default(false)
+  
+  eventId String? @db.ObjectId
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  member      Member @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  loan        Loan?    @relation(fields: [loanId], references: [id], onDelete: SetNull)
+  eventPayment EventPayment?
+}
+
+model ApprovedPayment {
+  id              String    @id @default(auto()) @map("_id") @db.ObjectId
+  memberId        String    @db.ObjectId
+  shareId         String?   @db.ObjectId
+  amount          Float
+  type            String
+  status          String    @default("Pending") // Pending, Approved, Rejected
+  paymentForMonth DateTime?
+
+  transactionId String? @unique
+  senderNumber  String?
+  notes         String?
+  paymentMethod String
+  
+  approvedBy      String?
+  approvedAt      DateTime?
+
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  eventId         String?  @db.ObjectId
+  event           Event?   @relation(fields: [eventId], references: [id], onDelete: SetNull)
+  member          Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  share           Share?   @relation(fields: [shareId], references: [id], onDelete: SetNull)
+}
+
+
+model Loan {
+  id                String    @id @default(auto()) @map("_id") @db.ObjectId
+  memberId          String    @db.ObjectId
+  applicationDate   DateTime  @default(now())
+  approvalDate      DateTime?
+  amount            Float
+  repaidAmount      Float     @default(0)
+  reason            String
+  additionalInfo    String?
+  repaymentPeriod   Int       // In months
+
+  applicationStatus String    @default("Pending") // Pending, Approved, Rejected
+  loanStatus        String    @default("N_A") // Active, Repaid, N_A
+
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  member            Member        @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  guarantor         Guarantor?
+  transactions      Transaction[]
+  installments      LoanInstallment[]
+}
+
+model Guarantor {
+  id                String    @id @default(auto()) @map("_id") @db.ObjectId
+  loanId            String    @unique @db.ObjectId
+  name              String
+  phone             String
+  address           String
+  nidNumber         String
+  nidCopyUrl        String
+  nidCopyPublicId   String
+  deathPayee        String // father, mother, etc.
+  
+  altPayeeName      String?
+  altPayeeRelation  String?
+  altPayeePhone     String?
+  altPayeeAddress   String?
+
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  loan              Loan      @relation(fields: [loanId], references: [id], onDelete: Cascade)
+}
+
+model LoanInstallment {
+  id      String   @id @default(auto()) @map("_id") @db.ObjectId
+  loanId  String   @db.ObjectId
+  month   DateTime
+  expected Float
+  paid    Float    @default(0)
+  status  String   @default("Due") // Due, Partial, Paid
+
+  loan    Loan     @relation(fields: [loanId], references: [id], onDelete: Cascade)
+  @@unique([loanId, month])
+}
+
+
+model Post {
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  title          String
+  content        String
+  type           String   // NOTICE, DASHBOARD_POST
+  status         String   // Published, Draft
+  authorId       String
+
+  imageUrls      String?
+  imagePublicIds String?
+
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Message {
+  id       String   @id @default(auto()) @map("_id") @db.ObjectId
+  memberId String   @db.ObjectId
+  title    String
+  content  String
+  isRead   Boolean  @default(false)
+  sentAt   DateTime @default(now())
+
+  member   Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
+}
+
+model ProfileUpdate {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  memberId   String   @db.ObjectId
+  status     String   @default("Pending") // Pending, Approved, Rejected
+  updateData Json
+
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  member     Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
+}
+
+model Settings {
+  key                         String    @id @default("singleton") @map("_id")
+  siteTitle                   String    @default("Bondhon'17")
+  logoUrl                     String?
+  logoPublicId                String?
+  minMonthlySavings           Float     @default(1000)
+  shareValue                  Float     @default(1000)
+  apiPaymentMethod            String?
+  policyContent               String    @default("Default policy text. Please update in admin settings.")
+  maxSharesPerMember          Int       @default(3)
+  loanToSavingsRatioNumerator   Int     @default(1)
+  loanToSavingsRatioDenominator Int     @default(3)
+  loanSystemEnabled           Boolean   @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model PaymentAccount {
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  accountName   String
+  accountType   String    // MobileBanking, Bank
+  accountNumber String
+  bankName      String?
+  notice        String    @default("")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Share {
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  memberId      String    @db.ObjectId
+  sharerName    String
+  sharerNid     String
+  sharerPhone   String
+  sharerAddress String
+  status        String    @default("Active") // Active, Removed, ForTransfer, Transferred, Converted
+  joiningDate   DateTime?
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  removedAt     DateTime?
+  convertedAt   DateTime?
+
+  member         Member          @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  transfers      ShareTransfer[]
+  monthlyPayments MonthlyPayment[]
+  approvedPayments ApprovedPayment[]
+}
+
+model ShareTransfer {
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  shareId       String    @db.ObjectId
+  fromMemberId  String    @db.ObjectId
+  toMemberId    String    @db.ObjectId
+  transferredAt DateTime  @default(now())
+  approvedBy    String
+
+  share         Share     @relation(fields: [shareId], references: [id], onDelete: Cascade)
+  fromMember    Member    @relation("ShareTransfersFrom", fields: [fromMemberId], references: [id], onDelete: Cascade)
+  toMember      Member    @relation("ShareTransfersTo", fields: [toMemberId], references: [id], onDelete: Cascade)
+}
+
+model Event {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  description String?
+  amount      Float
+  startDate   DateTime
+  endDate     DateTime
+  isActive    Boolean   @default(true)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  payments    EventPayment[]
+  approvedPayments ApprovedPayment[]
+}
+
+model EventPayment {
+  id            String  @id @default(auto()) @map("_id") @db.ObjectId
+  memberId      String  @db.ObjectId
+  eventId       String  @db.ObjectId
+  transactionId String  @unique @db.ObjectId
+  paid          Boolean @default(false)
+  
+  createdAt     DateTime @default(now())
+
+  member      Member      @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  event       Event       @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  transaction Transaction @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+
+  @@index([memberId])
+  @@index([eventId])
+}
+
+
+model MonthlyPayment {
+    id      String   @id @default(auto()) @map("_id") @db.ObjectId
+    memberId String  @db.ObjectId
+    shareId String?  @db.ObjectId
+    month   DateTime
+    expected Float
+    paid    Float    @default(0)
+    status  String   @default("Due") // Due, Partial, Paid
+
+    member  Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
+    share   Share?   @relation(fields: [shareId], references: [id], onDelete: SetNull)
+    
+    @@unique([memberId, shareId, month])
+}
