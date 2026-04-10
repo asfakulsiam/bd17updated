@@ -16,7 +16,7 @@ import { useSession } from "@/contexts/auth-context";
 import { useUnreadCounts } from "@/hooks/use-messages";
 import { useApp } from "@/contexts/app-context";
 import Image from "next/image";
-import { UserButton, SignedIn, SignedOut } from "@clerk/nextjs";
+import { UserButton, useUser, ClerkLoaded } from "@clerk/nextjs";
 import { getValidImageSrc } from "@/lib/utils";
 import { Skeleton } from "./ui/skeleton";
 
@@ -94,6 +94,8 @@ export default function Header() {
   const { data: counts } = useUnreadCounts(userId);
   const { settings, isInitialLoading } = useApp();
   
+  const { isSignedIn } = useUser();
+  
   const closeMobileMenu = () => setIsMobileMenuOpen(false);
 
   const Logo = () => {
@@ -135,14 +137,15 @@ export default function Header() {
 
         <div className="flex flex-1 items-center justify-end space-x-2">
             <div className="hidden md:flex items-center space-x-2">
-                <SignedIn>
-                    <UserButton afterSignOutUrl="/" />
-                </SignedIn>
-                <SignedOut>
-                    <Button asChild size="sm">
-                        <Link href="/sign-in">Sign In</Link>
-                    </Button>
-                </SignedOut>
+                <ClerkLoaded>
+                    {isSignedIn ? (
+                        <UserButton afterSignOutUrl="/" />
+                    ) : (
+                        <Button asChild size="sm">
+                            <Link href="/sign-in">Sign In</Link>
+                        </Button>
+                    )}
+                </ClerkLoaded>
                 <LanguageSwitcher />
                 <ThemeSwitcher />
             </div>
@@ -179,14 +182,15 @@ export default function Header() {
                       ))}
                     </nav>
                    <div className="flex items-center justify-center space-x-4 pt-4 border-t mt-auto">
-                      <SignedIn>
-                          <UserButton afterSignOutUrl="/" />
-                      </SignedIn>
-                       <SignedOut>
-                          <Button asChild>
-                            <Link href="/sign-in">Sign In</Link>
-                          </Button>
-                      </SignedOut>
+                      <ClerkLoaded>
+                          {isSignedIn ? (
+                              <UserButton afterSignOutUrl="/" />
+                          ) : (
+                              <Button asChild>
+                                <Link href="/sign-in">Sign In</Link>
+                              </Button>
+                          )}
+                      </ClerkLoaded>
                       <LanguageSwitcher />
                       <ThemeSwitcher />
                    </div>
