@@ -2,7 +2,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Globe, Send, Camera } from 'lucide-react';
+import { Facebook, Twitter, Instagram } from 'lucide-react';
 import { TakaSymbolIcon } from './icons/taka-symbol-icon';
 import { useLanguage } from '@/contexts/language-context';
 import { useApp } from '@/contexts/app-context';
@@ -121,13 +121,13 @@ const Footer = () => {
             <h3 className="font-headline font-semibold mb-4">{links.social}</h3>
             <div className="flex space-x-4">
               <Link href="#" className="text-muted-foreground hover:text-primary transition-colors">
-                <Globe className="h-6 w-6" />
+                <Facebook className="h-6 w-6" />
               </Link>
               <Link href="#" className="text-muted-foreground hover:text-primary transition-colors">
-                <Send className="h-6 w-6" />
+                <Twitter className="h-6 w-6" />
               </Link>
               <Link href="#" className="text-muted-foreground hover:text-primary transition-colors">
-                <Camera className="h-6 w-6" />
+                <Instagram className="h-6 w-6" />
               </Link>
             </div>
           </div>
