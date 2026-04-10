@@ -74,6 +74,7 @@ export interface Transaction {
   id: string;
   memberId: string;
   loanId?: string | null;
+  shareId?: string | null;
   date: string;
   amount: number;
   type: TransactionType;
@@ -252,12 +253,12 @@ export interface Settings {
     logoPublicId?: string | null;
     minMonthlySavings: number;
     shareValue: number;
-    apiPaymentMethod?: string | null;
     policyContent: string;
     maxSharesPerMember: number;
     loanToSavingsRatioNumerator: number;
     loanToSavingsRatioDenominator: number;
     loanSystemEnabled: boolean;
+    specialSavingsEnabled: boolean;
     createdAt: string;
     updatedAt: string;
 }

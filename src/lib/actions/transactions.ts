@@ -86,6 +86,7 @@ export async function approvePayment(approvedPaymentId: string) {
                         paymentMethod: payment.paymentMethod || 'Manual',
                         senderNumber: payment.senderNumber || undefined,
                         reason: payment.notes || 'Special Savings',
+                        shareId: payment.shareId || null,
                         approvedBy: userId
                     }
                 });
@@ -100,6 +101,7 @@ export async function approvePayment(approvedPaymentId: string) {
                     paymentMethod: payment.paymentMethod || 'Manual',
                     senderNumber: payment.senderNumber || undefined,
                     reason: payment.notes || undefined,
+                    shareId: payment.shareId || null,
                     approvedBy: userId
                 };
                 if (payment.eventId) {

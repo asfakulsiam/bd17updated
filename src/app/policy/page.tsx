@@ -29,13 +29,13 @@ export default async function PolicyPage() {
     }
 
     return (
-        <Card className="w-full max-w-5xl mx-auto shadow-lg">
-            <CardHeader className="text-center">
-                <CardTitle className="font-headline text-4xl">{title}</CardTitle>
-                <CardDescription>{description}</CardDescription>
+        <Card className="w-full max-w-5xl mx-auto shadow-xl border-none bg-card/50 backdrop-blur-sm">
+            <CardHeader className="text-center py-12">
+                <CardTitle className="font-headline text-4xl md:text-5xl font-bold tracking-tight text-primary">{title}</CardTitle>
+                <CardDescription className="text-lg mt-4">{description}</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-8 prose dark:prose-invert max-w-none">
-               <div dangerouslySetInnerHTML={{ __html: settings.policyContent.replace(/\n/g, '<br />') }} />
+            <CardContent className="space-y-8 prose dark:prose-invert max-w-none p-8 md:p-16 pt-0">
+               <div className="leading-relaxed text-lg" dangerouslySetInnerHTML={{ __html: settings.policyContent.replace(/\n/g, '<br />') }} />
             </CardContent>
         </Card>
     );

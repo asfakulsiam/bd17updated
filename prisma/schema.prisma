@@ -23,6 +23,7 @@ model Settings {
   loanToSavingsRatioNumerator   Int     @default(1)
   loanToSavingsRatioDenominator Int     @default(3)
   loanSystemEnabled             Boolean @default(false)
+  specialSavingsEnabled         Boolean @default(false)
   createdAt                     DateTime @default(now())
   updatedAt                     DateTime @updatedAt
 }
@@ -118,6 +119,7 @@ model Share {
   
   transfers       ShareTransfer[]
   monthlyPayments MonthlyPayment[]
+  transactions    Transaction[]
 }
 
 model Transaction {
@@ -126,6 +128,8 @@ model Transaction {
   member          Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
   loanId          String?
   loan            Loan?    @relation(fields: [loanId], references: [id], onDelete: SetNull)
+  shareId         String?
+  share           Share?   @relation(fields: [shareId], references: [id], onDelete: SetNull)
   date            DateTime
   amount          Float
   type            String

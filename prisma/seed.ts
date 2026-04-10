@@ -15,6 +15,7 @@ const settingsData = {
     loanToSavingsRatioNumerator: 1,
     loanToSavingsRatioDenominator: 3,
     loanSystemEnabled: false,
+    specialSavingsEnabled: false,
 };
 
 const paymentAccountData = [

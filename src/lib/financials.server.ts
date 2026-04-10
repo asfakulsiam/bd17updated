@@ -294,6 +294,7 @@ export async function allocateSavingsPayment(input: {
       status: 'Completed',
       date: new Date(),
       reason: paymentForMonth ? `Payment for ${paymentForMonth.month}` : notes,
+      shareId: paymentForMonth?.shareId || null,
       transactionId,
       paymentMethod,
       senderNumber,

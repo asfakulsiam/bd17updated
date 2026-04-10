@@ -1,10 +1,6 @@
 
 @import "tailwindcss";
 
-body {
-  font-family: 'PT Sans', sans-serif;
-}
-
 @theme {
   --color-background: hsl(170 53% 92%);
   --color-foreground: hsl(215 30% 20%);
@@ -28,14 +24,61 @@ body {
   --radius-lg: 0.5rem;
   --radius-md: calc(0.5rem - 2px);
   --radius-sm: calc(0.5rem - 4px);
+
+  --font-headline: 'Poppins', sans-serif;
+  --font-body: 'PT Sans', sans-serif;
 }
 
 @layer base {
+  :root {
+    --background: 170 53% 92%;
+    --foreground: 215 30% 20%;
+    --card: 170 53% 97%;
+    --card-foreground: 215 30% 20%;
+    --popover: 170 53% 97%;
+    --popover-foreground: 215 30% 20%;
+    --primary: 158 45% 54%;
+    --primary-foreground: 160 100% 5%;
+    --secondary: 170 40% 85%;
+    --secondary-foreground: 215 30% 20%;
+    --muted: 170 40% 85%;
+    --muted-foreground: 215 30% 40%;
+    --accent: 89 56% 66%;
+    --accent-foreground: 90 100% 10%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 170 40% 80%;
+    --input: 170 40% 85%;
+    --ring: 158 45% 54%;
+  }
+
+  .dark {
+    --background: 215 30% 10%;
+    --foreground: 170 53% 97%;
+    --card: 215 30% 12%;
+    --card-foreground: 170 53% 97%;
+    --popover: 215 30% 12%;
+    --popover-foreground: 170 53% 97%;
+    --primary: 158 45% 54%;
+    --primary-foreground: 160 100% 5%;
+    --secondary: 215 30% 15%;
+    --secondary-foreground: 170 53% 97%;
+    --muted: 215 30% 15%;
+    --muted-foreground: 215 30% 60%;
+    --accent: 89 56% 40%;
+    --accent-foreground: 170 53% 97%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 170 53% 97%;
+    --border: 215 30% 20%;
+    --input: 215 30% 20%;
+    --ring: 158 45% 54%;
+  }
+
   * {
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-body antialiased;
   }
   input[type="number"]::-webkit-inner-spin-button,
   input[type="number"]::-webkit-outer-spin-button {
@@ -48,6 +91,10 @@ body {
 }
 
 @layer utilities {
+  .container {
+    @apply mx-auto px-4 sm:px-6 lg:px-8 w-full max-w-7xl;
+  }
+
   .printable-receipt {
     .receipt-content {
       display: block;
@@ -75,6 +122,17 @@ body {
   .animate-fade-in-up {
       animation: fade-in-up 0.5s ease-in-out forwards;
       opacity: 0;
+  }
+
+  @keyframes fade-in-up {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 }
 

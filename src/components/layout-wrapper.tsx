@@ -12,9 +12,12 @@ export default function LayoutWrapper({ children }: { children: ReactNode }) {
     const isAdminRoute = pathname.startsWith('/admin');
 
     return (
-        <div className="relative flex flex-col" style={{ minHeight: '100svh' }}>
+        <div className="relative flex min-h-screen flex-col bg-background text-foreground transition-colors duration-300">
             {!isAdminRoute && <Header />}
-            <main className={cn("flex-1", !isAdminRoute && "container py-8")}>
+            <main className={cn(
+                "flex-1 w-full",
+                !isAdminRoute && "container py-8 md:py-12"
+            )}>
                 {children}
             </main>
             {!isAdminRoute && <Footer />}

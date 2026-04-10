@@ -6,8 +6,6 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
-  CardDescription,
-  CardFooter,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Megaphone, Newspaper, Target, BookOpen, User, Wallet, Receipt, Banknote, Building2, UserCog, HeartHandshake, FileBadge, CheckCircle, Users } from "lucide-react";
@@ -122,56 +120,57 @@ export function HomeClient() {
   const { data: posts, isLoading: postsLoading } = useDashboardPosts();
 
   const HeroSection = () => (
-      <section className="w-full text-center py-12 rounded-lg bg-card border animate-fade-in-up">
+      <section className="w-full text-center py-16 md:py-24 rounded-3xl bg-card border shadow-sm animate-fade-in-up relative overflow-hidden">
+        <div className="absolute inset-0 bg-primary/5 -z-10" />
         {user ? (
-          <>
-            <h1 className="font-headline text-4xl md:text-5xl font-bold text-primary">
+          <div className="px-6">
+            <h1 className="font-headline text-4xl md:text-6xl font-bold text-primary tracking-tight">
               {text.welcomeBack} {user.firstName || user.emailAddresses[0].emailAddress.split('@')[0]}!
             </h1>
-            <p className="mt-4 text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
+            <p className="mt-6 text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
               {text.heroSubtitle}
             </p>
-            <div className="mt-8 flex flex-col sm:flex-row justify-center gap-4">
-              <Button asChild size="lg">
-                <Link href="/account"><User className="mr-2"/>{text.myAccount}</Link>
+            <div className="mt-10 flex flex-wrap justify-center gap-4">
+              <Button asChild size="lg" className="rounded-full px-8">
+                <Link href="/account"><User className="mr-2 h-5 w-5"/>{text.myAccount}</Link>
               </Button>
-              <Button asChild size="lg" variant="outline">
-                <Link href="/payment"><Wallet className="mr-2"/>{text.makePayment}</Link>
+              <Button asChild size="lg" variant="outline" className="rounded-full px-8">
+                <Link href="/payment"><Wallet className="mr-2 h-5 w-5"/>{text.makePayment}</Link>
               </Button>
-              <Button asChild size="lg" variant="secondary">
-                <Link href="/transactions"><Receipt className="mr-2"/>{text.transactions}</Link>
+              <Button asChild size="lg" variant="secondary" className="rounded-full px-8">
+                <Link href="/transactions"><Receipt className="mr-2 h-5 w-5"/>{text.transactions}</Link>
               </Button>
             </div>
-          </>
+          </div>
         ) : (
-          <>
-            <h1 className="font-headline text-4xl md:text-5xl font-bold text-primary">
+          <div className="px-6">
+            <h1 className="font-headline text-4xl md:text-6xl font-bold text-primary tracking-tight">
               {text.heroTitle}
             </h1>
-            <p className="mt-4 text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
+            <p className="mt-6 text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
               {text.heroSubtitle}
             </p>
-            <Button asChild size="lg" className="mt-8">
+            <Button asChild size="lg" className="mt-10 rounded-full px-10">
               <Link href="/registration">{text.heroButton}</Link>
             </Button>
-          </>
+          </div>
         )}
       </section>
   );
 
   return (
-    <div className="space-y-12 flex flex-col items-center">
+    <div className="space-y-20 flex flex-col items-center w-full">
       <HeroSection />
       
-      <section className="w-full max-w-3xl">
+      <section className="w-full max-w-5xl">
           <div className="text-center mb-12">
-            <h2 className="font-headline text-4xl font-bold">{text.policyTitle}</h2>
-            <p className="text-muted-foreground mt-2">{text.policyDesc}</p>
+            <h2 className="font-headline text-3xl md:text-4xl font-bold tracking-tight">{text.policyTitle}</h2>
+            <p className="text-muted-foreground mt-4 text-lg">{text.policyDesc}</p>
           </div>
-          <Accordion type="single" collapsible className="w-full">
+          <Accordion type="single" collapsible className="w-full border rounded-2xl overflow-hidden bg-card/50 backdrop-blur-sm shadow-sm">
             <PolicyAccordionItem
                 value="item-1"
-                icon={<Target className="w-8 h-8 text-primary"/>} 
+                icon={<Target className="w-6 h-6 text-primary"/>} 
                 title="সংক্ষেপে বন্ধন'১৭" 
                 items={[
                     "একটি ১০ বছরের সঞ্চয়ভিত্তিক প্রকল্প (২০২৫–২০৩৫)",
@@ -181,7 +180,7 @@ export function HomeClient() {
             />
              <PolicyAccordionItem
                 value="item-2"
-                icon={<Banknote className="w-8 h-8 text-primary"/>} 
+                icon={<Banknote className="w-6 h-6 text-primary"/>} 
                 title="মাসিক চাঁদা ও অর্থনীতি" 
                 items={[
                     "মাসিক চাঁদা: ৳১০০০ (প্রতি মাসের ৫–১৫ তারিখ)",
@@ -192,7 +191,7 @@ export function HomeClient() {
             />
             <PolicyAccordionItem
                 value="item-3"
-                icon={<Building2 className="w-8 h-8 text-primary"/>} 
+                icon={<Building2 className="w-6 h-6 text-primary"/>} 
                 title="পরিকল্পিত উন্নয়ন" 
                 items={[
                     "জমি ক্রয় ও বিক্রয়",
@@ -204,7 +203,7 @@ export function HomeClient() {
             />
             <PolicyAccordionItem
                 value="item-4"
-                icon={<Users className="w-8 h-8 text-primary"/>} 
+                icon={<Users className="w-6 h-6 text-primary"/>} 
                 title="সদস্য সম্পর্কিত" 
                 items={[
                     "সদস্য হতে হলে ২০১৭ SSC ব্যাচের ছাত্র হতে হবে",
@@ -214,7 +213,7 @@ export function HomeClient() {
             />
              <PolicyAccordionItem
                 value="item-5"
-                icon={<UserCog className="w-8 h-8 text-primary"/>} 
+                icon={<UserCog className="w-6 h-6 text-primary"/>} 
                 title="ক্যাশিয়ার কমিটি" 
                 items={[
                     "প্রতি বছর ১ জন প্রধান ও ৫ সদস্য বিশিষ্ট ক্যাশিয়ার কমিটি গঠন",
@@ -224,7 +223,7 @@ export function HomeClient() {
             />
             <PolicyAccordionItem
                 value="item-6"
-                icon={<HeartHandshake className="w-8 h-8 text-primary"/>} 
+                icon={<HeartHandshake className="w-6 h-6 text-primary"/>} 
                 title="বন্ধুত্ব ও মানবিকতা" 
                 items={[
                     "বিপদে পাশে থাকা (সাহায্য তহবিল)",
@@ -235,11 +234,11 @@ export function HomeClient() {
             />
              <PolicyAccordionItem
                 value="item-7"
-                icon={<FileBadge className="w-8 h-8 text-primary"/>} 
+                icon={<FileBadge className="w-6 h-6 text-primary"/>} 
                 title="সিদ্ধান্ত ও নিয়ম" 
                 items={[
                     "সব সিদ্ধান্ত হবে সকল সদস্যের সম্মতিক্রমে",
-                    "শেয়ার হস্তান্তর/ক্রয় সীমাবদ্ধ ও নীতিমালাভিত্তিক",
+                    "শেয়ার হস্তান্তর/ক্রয় সীমাবদ্ধ ও নীতিমালাভভিত্তিক",
                     "প্রয়োজনে কমিটি গঠন/পরিবর্তন বা নতুন সদস্য সংযুক্তি"
                 ]}
             />
@@ -247,116 +246,127 @@ export function HomeClient() {
       </section>
 
       <section className="w-full max-w-5xl">
-        <h2 className="font-headline text-3xl font-bold mb-4 text-center">{text.announcements}</h2>
+        <div className="flex items-center justify-between mb-10">
+            <h2 className="font-headline text-3xl md:text-4xl font-bold tracking-tight">{text.announcements}</h2>
+            <Button asChild variant="ghost" size="sm" className="hover:bg-primary/10">
+                <Link href="/notices" className="flex items-center gap-2">
+                    {text.viewAllNotices} <ArrowRight className="h-4 w-4" />
+                </Link>
+            </Button>
+        </div>
+        
         {noticesLoading ? <PostSkeleton /> : (
             notices && notices.length > 0 ? (
-                <div className="space-y-4">
+                <div className="grid gap-8 sm:grid-cols-2">
                     {notices.map((notice) => (
-                        <Card key={notice.id} className="w-full transition-shadow hover:shadow-md">
+                        <Card key={notice.id} className="group overflow-hidden transition-all hover:shadow-xl hover:-translate-y-1 border-none bg-card/50 backdrop-blur-sm shadow-sm">
                              <Link href={`/notices/${notice.id}`}>
-                                <CardContent className="p-6">
-                                    <h3 className="font-semibold font-headline text-lg">{notice.title}</h3>
-                                    <p className="text-xs text-muted-foreground mb-2">{text.postedOn} {new Date(notice.createdAt).toLocaleDateString()}</p>
-                                    <p className="text-muted-foreground text-sm line-clamp-2">{notice.content}</p>
-                                    <Button asChild variant="link" className="p-0 mt-2">
-                                        <div>
-                                            {text.readMore} <ArrowRight className="ml-2 h-4 w-4" />
-                                        </div>
-                                    </Button>
+                                <CardContent className="p-8">
+                                    <h3 className="font-semibold font-headline text-xl group-hover:text-primary transition-colors">{notice.title}</h3>
+                                    <p className="text-xs text-muted-foreground mb-4 flex items-center gap-2">
+                                        <BookOpen className="h-3 w-3" />
+                                        {text.postedOn} {new Date(notice.createdAt).toLocaleDateString()}
+                                    </p>
+                                    <p className="text-muted-foreground text-sm line-clamp-3 leading-relaxed">{notice.content}</p>
+                                    <div className="mt-6 flex items-center text-primary text-sm font-semibold">
+                                        {text.readMore} <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                                    </div>
                                 </CardContent>
                             </Link>
                         </Card>
                     ))}
                 </div>
             ) : (
-                 <p className="text-sm text-muted-foreground text-center py-4">{text.noNotices}</p>
+                 <div className="bg-card/30 border border-dashed rounded-2xl py-16 text-center">
+                    <Megaphone className="h-12 w-12 text-muted-foreground/20 mx-auto mb-4" />
+                    <p className="text-muted-foreground">{text.noNotices}</p>
+                 </div>
             )
         )}
-        <div className="text-center mt-6">
-            <Button asChild variant="outline">
-                <Link href="/notices">
-                    <Megaphone className="mr-2 h-4 w-4" />
-                    {text.viewAllNotices}
-                </Link>
-            </Button>
-        </div>
       </section>
 
-      <section className="w-full max-w-5xl bg-card p-8 rounded-lg shadow-md">
-        <div className="grid md:grid-cols-2 gap-8 items-center">
+      <section className="w-full max-w-5xl bg-primary/5 border border-primary/10 p-8 md:p-16 rounded-[2.5rem] overflow-hidden relative">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-primary/10 rounded-full blur-[100px] -mr-48 -mt-48" />
+        <div className="grid md:grid-cols-2 gap-16 items-center relative z-10">
           <div>
-            <h2 className="font-headline text-3xl font-bold mb-4">{text.ourGoal}</h2>
-            <p className="text-muted-foreground mb-6">
+            <h2 className="font-headline text-3xl md:text-5xl font-bold mb-8 tracking-tight">{text.ourGoal}</h2>
+            <p className="text-muted-foreground text-lg mb-10 leading-relaxed">
               {text.goalDescription}
             </p>
-            <ul className="space-y-3">
-              <li className="flex items-start">
-                <CheckCircle className="w-5 h-5 text-accent mr-3 mt-1 flex-shrink-0" />
-                <span>{text.goal1}</span>
-              </li>
-              <li className="flex items-start">
-                <CheckCircle className="w-5 h-5 text-accent mr-3 mt-1 flex-shrink-0" />
-                <span>{text.goal2}</span>
-              </li>
-              <li className="flex items-start">
-                <CheckCircle className="w-5 h-5 text-accent mr-3 mt-1 flex-shrink-0" />
-                <span>{text.goal3}</span>
-              </li>
+            <ul className="space-y-5">
+              {[text.goal1, text.goal2, text.goal3].map((goal, i) => (
+                <li key={i} className="flex items-start gap-5">
+                    <div className="h-7 w-7 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0 mt-1">
+                        <CheckCircle className="w-4 h-4 text-primary" />
+                    </div>
+                    <span className="text-foreground/90 text-lg">{goal}</span>
+                </li>
+              ))}
             </ul>
           </div>
-          <div className="relative h-64 md:h-80 rounded-lg overflow-hidden">
+          <div className="relative h-80 md:h-[30rem] rounded-3xl overflow-hidden shadow-2xl ring-1 ring-primary/20">
             <Image 
               src="https://picsum.photos/seed/ourgoal/800/600" 
               alt="Community Goal" 
               fill
-              className="transition-transform duration-500 hover:scale-105 object-cover"
+              className="transition-transform duration-1000 hover:scale-110 object-cover"
               data-ai-hint="teamwork collaboration"
             />
           </div>
         </div>
       </section>
 
-      <Card className="w-full max-w-5xl">
-        <CardHeader>
-          <CardTitle className="font-headline flex items-center">
-            <Newspaper className="mr-2 text-primary" /> {text.dashboardPosts}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-           {postsLoading ? <PostSkeleton /> : (
-              posts && posts.length > 0 ? (
-                  <Carousel className="w-full">
-                      <CarouselContent>
-                          {posts.map((post) => (
-                              <CarouselItem key={post.id}>
-                                  <Link href={`/notices/${post.id}`} className="block p-1">
-                                      <Card className="overflow-hidden">
-                                          <CardContent className="p-0">
-                                               <Image
-                                                  src={getValidImageSrc(post.imageUrls[0])}
-                                                  alt={post.title}
-                                                  width={600}
-                                                  height={400}
-                                                  className="aspect-video object-cover w-full"
-                                              />
-                                              <div className="p-4">
-                                                  <h3 className="font-semibold">{post.title}</h3>
-                                              </div>
-                                          </CardContent>
-                                      </Card>
-                                  </Link>
-                              </CarouselItem>
-                          ))}
-                      </CarouselContent>
-                      <CarouselPrevious className="left-2" />
-                      <CarouselNext className="right-2" />
-                  </Carousel>
-              ) : (
-                  <p className="text-sm text-muted-foreground text-center py-4">{text.noPosts}</p>
-              )
-           )}
-        </CardContent>
-      </Card>
+      <div className="w-full max-w-5xl space-y-8">
+        <div className="flex items-center gap-4">
+            <div className="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center">
+                <Newspaper className="text-primary h-7 w-7" />
+            </div>
+            <h2 className="font-headline text-3xl md:text-4xl font-bold tracking-tight">{text.dashboardPosts}</h2>
+        </div>
+        
+        {postsLoading ? <PostSkeleton /> : (
+            posts && posts.length > 0 ? (
+                <Carousel className="w-full" opts={{ align: "start", loop: true }}>
+                    <CarouselContent className="-ml-6">
+                        {posts.map((post) => (
+                            <CarouselItem key={post.id} className="pl-6 md:basis-1/2 lg:basis-1/3">
+                                <Link href={`/notices/${post.id}`} className="block group">
+                                    <Card className="overflow-hidden border-none shadow-md transition-all hover:shadow-2xl rounded-2xl bg-card">
+                                        <CardContent className="p-0">
+                                             <div className="relative aspect-[4/3] overflow-hidden">
+                                                 <Image
+                                                    src={getValidImageSrc(post.imageUrls[0])}
+                                                    alt={post.title}
+                                                    fill
+                                                    className="object-cover transition-transform duration-700 group-hover:scale-110"
+                                                />
+                                                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-6">
+                                                    <span className="text-white text-sm font-semibold flex items-center gap-2">
+                                                        {text.readMore} <ArrowRight className="h-4 w-4" />
+                                                    </span>
+                                                </div>
+                                             </div>
+                                            <div className="p-6">
+                                                <h3 className="font-bold text-lg line-clamp-1 group-hover:text-primary transition-colors">{post.title}</h3>
+                                            </div>
+                                        </CardContent>
+                                    </Card>
+                                </Link>
+                            </CarouselItem>
+                        ))}
+                    </CarouselContent>
+                    <div className="flex justify-end gap-3 mt-8">
+                      <CarouselPrevious className="static translate-y-0 h-12 w-12 rounded-full border-primary/20 hover:bg-primary/10" />
+                      <CarouselNext className="static translate-y-0 h-12 w-12 rounded-full border-primary/20 hover:bg-primary/10" />
+                    </div>
+                </Carousel>
+            ) : (
+                <div className="bg-card/30 border border-dashed rounded-2xl py-16 text-center">
+                  <p className="text-muted-foreground">{text.noPosts}</p>
+                </div>
+            )
+        )}
+      </div>
     </div>
   );
 }
